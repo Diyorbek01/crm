@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        <h4>lkdsfj</h4>
+        
+    </div>
+
+    <script>
+        const notifSocket = new WebSocket('ws://192.168.1.114:8000/ws/notifications/3/')
+        var notifications = []
+        notifSocket.onmessage = function(e){
+            console.log(e.data)
+            var jsson_data = JSON.parse(e.data)
+            console.log(jsson_data, "json data")
+            console.log(jsson_data['text'])
+            data = {
+                'count':1,
+                'chat_id':jsson_data.chat_id,
+                'message':[jsson_data.text]
+
+            }
+            notifications.push(data)
+            console.log(notifications)
+
+        }
+    </script>
+</body>
+</html>

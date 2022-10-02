@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>room</title>
+</head>
+<body>
+    
+    <textarea name="" id="chat-log" cols="50" rows="20"></textarea><br><br>
+    <input type="text" name="" id="type-input">
+    <input type="submit" name="" id="">
+</body>
+<script>
+
+    const path_name = window.location.pathname;
+    var split_path = path_name.split('/')
+    var chat_id = split_path[split_path.length - 2]
+    const url = `ws://192.168.1.114:8000/ws/chat/${chat_id}/`
+    
+    const headers = {
+        Authorization: 'Token b3ac3a0fd14e7a92bfc1e5758121b92b487ee3e2',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    async function getToken(markaz_id){
+        const api_url = "http://192.168.1.114:8000/get_token/?markaz_id=1"
+        const response = await fetch(api_url, {headers})
+        
+        .then(response => response.json())
+        .then(data =>  data['token'])
+    }
+    const chatSocket = new WebSocket(url)
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        document.querySelector('#chat-log').value += (data.text + '\n');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#type-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            const messageInputDom = document.querySelector('#type-input');
+            const message = messageInputDom.value;
+            const path = window.location.pathname.split('/')
+           
+             
+            chatSocket.send(JSON.stringify({
+                'text': message,
+                'chat_id':path[path.length-2],// telegram id
+                'title':"Muhammad",
+                'own':true,
+                'token':"2020316126:AAGznP4Hx6DC02stEPktvmx9b5m9_NWQel4"
+                
+            }));
+            messageInputDom.value = '';
+        }
+    };
+</script>
+</html>

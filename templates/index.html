@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Chats</h2>
+    <div id="chats">
+
+    </div>
+        
+        
+        <script>
+            const headers = {
+                Authorization: 'Token b3ac3a0fd14e7a92bfc1e5758121b92b487ee3e2',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+<h1></h1>
+            async function getChats(url){
+                const response = await fetch(url, {headers});
+                var data = await response.json();
+                console.log(data[0], typeof data, 'data');
+
+                var royxat = ''
+                data.forEach(chat => {
+                    royxat += `<a href="/room/${chat.user_chat_id}/">${chat.title}</a>`
+                })
+                document.getElementById('chats').innerHTML = royxat
+                return data[0];
+                }
+            var chats = getChats('http://127.0.0.1:8000/main/chat/get/?markaz_id=1');
+            
+
+            console.log(chats)
+
+        </script>
+</body>
+</html>

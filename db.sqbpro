@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="E:\New folder\Backend\rootcrm\db.sqlite3" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="4104"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,11:maingroup_group"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="auth_group" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="43"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="group_group" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="96"/><column index="3" value="71"/><column index="4" value="112"/><column index="5" value="109"/><column index="6" value="110"/><column index="7" value="73"/><column index="8" value="76"/><column index="9" value="71"/><column index="10" value="74"/><column index="11" value="60"/><column index="12" value="78"/><column index="13" value="40"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="group_group_week" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="60"/><column index="2" value="65"/><column index="3" value="61"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="students_students" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="121"/><column index="3" value="106"/><column index="4" value="73"/><column index="5" value="54"/><column index="6" value="245"/><column index="7" value="91"/><column index="8" value="107"/><column index="9" value="132"/><column index="10" value="119"/><column index="11" value="40"/><column index="12" value="73"/><column index="13" value="76"/><column index="14" value="74"/><column index="15" value="40"/><column index="16" value="115"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="students_students_group" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="85"/><column index="3" value="65"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">SELECT  gr.id as id, gr.name as gr_name,
+course.id as course_id, course.name as course_name, course.price as price, count(student.id) as students,
+count(student.id)*course.price as total_pay
+FROM group_group as gr
+
+
+left join main_course as course on gr.course_id=course.id
+left join students_students_group as student on student.group_id=gr.id
+LEFT JOIN students_students as sstudent on sstudent.id = student.id
+WHERE sstudent.payment_status = 1 and gr.markaz_id = 1
+
+GROUP by gr.id</sql><sql name="SQL 3">SELECT  gr.id as group_id, gr.name as gr_name,
+course.id as course_id, course.name as course_name, course.price as price, count(student.id) as students,
+count(student.id)*course.price as total_salary
+FROM group_group as gr
+
+
+left join main_course as course on gr.course_id=course.id
+left join students_students_group as student on student.group_id=gr.id
+
+GROUP by gr.id</sql><sql name="SQL 4">SELECT op.id,sum(itt.amount) as item_pro,mar.name AS market_id,mar.id AS mar_id,sum(itt.amount * itt.input_price)
+ AS summa,
+((SELECT SUM(amount) FROM operations_pay AS pay
+WHERE pay.market_id=mar.id
+group BY pay.market_id)-sum(itt.amount * itt.input_price)) AS hisobida,
+(SELECT SUM(amount) FROM operations_pay AS pay
+WHERE pay.market_id=mar.id
+group BY pay.market_id) AS pay
+from operations_operations AS op
+LEFT JOIN operations_market AS mar ON mar.id = op.market_id
+LEFT JOIN operations_operationsitem AS itt ON itt.operation_id =op.id
+WHERE op.status = 2 and mar.id=%s
+GROUP BY op.market_id</sql><sql name="SQL 5">SELECT  teacher.id, gr.id as group_id, teacher.full_name as teacher_name, gr.name as gr_name,
+course.id as course_id, course.name as course_name, course.price as price, count(student.id) as students, 
+count(gr.id) as groups, count(student.id)*course.price as total_salary, salary.type as status, salary.amount as amount,
+
+CASE
+    WHEN salary.type = 1 THEN count(student.id)*course.price*10/salary.amount
+    WHEN salary.type = 2 THEN count(student.id)*salary.amount
+    ELSE salary.amount
+END AS salary FROM main_staff as teacher
+
+left join group_group as gr on gr.teacher_id=teacher.id
+left join main_course as course on gr.course_id=course.id
+left join students_students_group as student on student.group_id=gr.id
+left join payment_salary as salary on salary.mentor_id=teacher.id
+WHERE teacher.role = &quot;Teacher&quot;
+GROUP by teacher.id</sql><sql name="SQL 6">SELECT teacher.id as teacher_id, teacher.full_name as teacher_name, count(gr.id) as number_gr, course.name as course_name, 
+course.price as price from main_staff as teacher
+left join group_group as gr on gr.teacher_id = teacher.id
+left join stu as gr on gr.teacher_id = teacher.id
+LEFT JOIN main_course as course on course.id = gr.course_id
+where teacher.role = 'Teacher'
+GROUP by teacher.id</sql><current_tab id="3"/></tab_sql></sqlb_project>
